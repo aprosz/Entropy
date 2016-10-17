@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -17,9 +21,13 @@ namespace Mvc.LocalizationSample.Web
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var result = base.IsValid(value, validationContext);
+            if (validationContext == null)
+            {
+                throw new ArgumentNullException(nameof(validationContext));
+            }
 
-            if (result.ErrorMessage != null)
+            var result = base.IsValid(value, validationContext);
+            if (!string.IsNullOrEmpty(result.ErrorMessage))
             {
                 result.ErrorMessage = GetErrorMessage(validationContext);
             }
@@ -51,6 +59,14 @@ namespace Mvc.LocalizationSample.Web
 
             MergeAttribute(context.Attributes, "data-val-maxlength", errorMessage);
             MergeAttribute(context.Attributes, "data-val-maxlength-max", "2");
+        }
+
+        private static void MergeAttribute(IDictionary<string, string> attributes, string key, string value)
+        {
+            if (!attributes.ContainsKey(key))
+            {
+                attributes.Add(key, value);
+            }
         }
     }
 }

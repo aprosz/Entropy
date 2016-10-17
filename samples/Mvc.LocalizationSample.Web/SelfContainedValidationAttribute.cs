@@ -1,5 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
@@ -12,22 +14,6 @@ namespace Mvc.LocalizationSample.Web
     public abstract class SelfContainedValidationAttribute : ValidationAttribute, IClientModelValidator
     {
         public abstract void AddValidation(ClientModelValidationContext context);
-
-        private IStringLocalizer GetStringLocalizer(
-            MvcDataAnnotationsLocalizationOptions options,
-            IStringLocalizerFactory factory,
-            Type modelType)
-        {
-            var provider = options.DataAnnotationLocalizerProvider;
-            if (factory != null && provider != null)
-            {
-                return provider(modelType, factory);
-            }
-            else
-            {
-                return null;
-            }
-        }
 
         protected string GetErrorMessage(ClientModelValidationContext context)
         {
@@ -52,6 +38,22 @@ namespace Mvc.LocalizationSample.Web
             return GetErrorMessage(validationContext.DisplayName, stringLocalizer);
         }
 
+        private IStringLocalizer GetStringLocalizer(
+            MvcDataAnnotationsLocalizationOptions options,
+            IStringLocalizerFactory factory,
+            Type modelType)
+        {
+            var provider = options.DataAnnotationLocalizerProvider;
+            if (factory != null && provider != null)
+            {
+                return provider(modelType, factory);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private string GetErrorMessage(string displayName, IStringLocalizer stringLocalizer)
         {
             if (stringLocalizer != null &&
@@ -63,17 +65,6 @@ namespace Mvc.LocalizationSample.Web
             }
 
             return FormatErrorMessage(displayName);
-        }
-
-        protected static bool MergeAttribute(IDictionary<string, string> attributes, string key, string value)
-        {
-            if (attributes.ContainsKey(key))
-            {
-                return false;
-            }
-
-            attributes.Add(key, value);
-            return true;
         }
     }
 }
